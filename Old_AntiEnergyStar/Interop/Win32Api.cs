@@ -1,8 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
 
-namespace EnergyStar.Interop
+namespace AntiEnergyStar.Interop
 {
     internal class Win32Api
     {

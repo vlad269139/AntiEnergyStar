@@ -1,6 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
-namespace EnergyStar.Interop
+namespace AntiEnergyStar.Interop
 {
     [StructLayout(LayoutKind.Sequential)]
     internal struct Win32WindowForegroundMessage
@@ -11,6 +12,7 @@ namespace EnergyStar.Interop
         public IntPtr LParam;
         public uint Time;
         public System.Drawing.Point Point;
+        
     }
 
     internal class Event

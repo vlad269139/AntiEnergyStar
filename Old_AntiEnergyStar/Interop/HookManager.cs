@@ -1,7 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace EnergyStar.Interop
+namespace AntiEnergyStar.Interop
 {
     internal class HookManager
     {

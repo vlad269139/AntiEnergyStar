@@ -1,0 +1,7 @@
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\obj\Release\Old_AntiEnergyStar.csproj.CoreCompileInputs.cache
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\bin\Release\settings.json
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\bin\Release\Newtonsoft.Json.dll
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\obj\Release\Old_AntiEnergyStar.csproj.CopyComplete
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\bin\Release\AntiEnergyStar.exe.config
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\bin\Release\AntiEnergyStar.exe
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\obj\Release\AntiEnergyStar.exe

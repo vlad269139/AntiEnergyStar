@@ -1,0 +1,10 @@
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\bin\Debug\Old_AntiEnergyStar.exe.config
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\bin\Debug\Old_AntiEnergyStar.exe
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\bin\Debug\Old_AntiEnergyStar.pdb
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\obj\Debug\Old_AntiEnergyStar.csproj.AssemblyReference.cache
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\obj\Debug\Old_AntiEnergyStar.csproj.CoreCompileInputs.cache
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\obj\Debug\Old_AntiEnergyStar.exe
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\obj\Debug\Old_AntiEnergyStar.pdb
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\bin\Debug\Newtonsoft.Json.dll
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\obj\Debug\Old_AntiEnergyStar.csproj.CopyComplete
+C:\Users\vlad269139\Downloads\C#\Old_AntiEnergyStar\Old_AntiEnergyStar\Old_AntiEnergyStar\bin\Debug\settings.json

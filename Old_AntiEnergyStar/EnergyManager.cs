@@ -1,54 +1,31 @@
-﻿using EnergyStar.Interop;
+﻿using AntiEnergyStar.Interop;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace EnergyStar
+namespace AntiEnergyStar
 {
     public unsafe class EnergyManager
     {
-        public static readonly HashSet<string> BypassProcessList = new HashSet<string>
+        public static readonly HashSet<string> KeepingProcessList = new HashSet<string>
         {
-            // Not ourselves
-            "EnergyStar.exe".ToLowerInvariant(),
-            // Edge has energy awareness
-            "msedge.exe",
-            "WebViewHost.exe".ToLowerInvariant(),
-            // UWP Frame has special handling, should not be throttled
-            "ApplicationFrameHost.exe".ToLowerInvariant(),
-            // Fire extinguisher should not catch fire
-            "taskmgr.exe",
-            "procmon.exe",
-            "procmon64.exe",
-            // Widgets
-            "Widgets.exe".ToLowerInvariant(),
-            // System shell
-            "dwm.exe",
-            "explorer.exe",
-            "ShellExperienceHost.exe".ToLowerInvariant(),
-            "StartMenuExperienceHost.exe".ToLowerInvariant(),
-            "SearchHost.exe".ToLowerInvariant(),
-            "sihost.exe",
-            "fontdrvhost.exe",
-            // IME
-            "ChsIME.exe".ToLowerInvariant(),
-            "ctfmon.exe",
 #if DEBUG
             // Visual Studio
             "devenv.exe",
 #endif
-            // System Service - they have their awareness
-            "csrss.exe",
-            "smss.exe",
-            "svchost.exe",
-            // WUDF
-            "WUDFRd.exe".ToLowerInvariant(),
         };
+
+        public static readonly uint WaitingDelay;
+
+
         // Speical handling needs for UWP to get the child window process
         public const string UWPFrameHostApp = "ApplicationFrameHost.exe";
 
-        private static uint pendingProcPid = 0;
-        private static string pendingProcName = "";
+        //private static uint pendingProcPid = 0;
+        //private static string pendingProcName = "";
 
         private static IntPtr pThrottleOn = IntPtr.Zero;
         private static IntPtr pThrottleOff = IntPtr.Zero;
@@ -56,7 +33,24 @@ namespace EnergyStar
 
         static EnergyManager()
         {
-            szControlBlock = Marshal.SizeOf<Win32Api.PROCESS_POWER_THROTTLING_STATE>();
+            var settings = Settings.Instance;
+
+
+            KeepingProcessList.UnionWith(
+                settings.Processes.Select(s => s.ToLowerInvariant())
+                );
+            KeepingProcessList.UnionWith(
+                new string[] { AppDomain.CurrentDomain.FriendlyName }
+                );
+
+            Console.WriteLine($"Delay: {settings.Delay} seconds.\r\nList:");
+            
+            foreach (var n in KeepingProcessList)
+                Console.WriteLine($"  > {n}");
+
+
+
+            szControlBlock = Marshal.SizeOf(typeof(Win32Api.PROCESS_POWER_THROTTLING_STATE));
             pThrottleOn = Marshal.AllocHGlobal(szControlBlock);
             pThrottleOff = Marshal.AllocHGlobal(szControlBlock);
 
@@ -92,7 +86,8 @@ namespace EnergyStar
 
             if (Win32Api.QueryFullProcessImageName(hProcess, 0, sb, ref capacity))
             {
-                return Path.GetFileName(sb.ToString());
+                //System.IO.Path.GetFileName(sb);
+                return System.IO.Path.GetFileName(sb.ToString());
             }
 
             return "";
@@ -139,50 +134,76 @@ namespace EnergyStar
             }
 
             // Boost the current foreground app, and then impose EcoQoS for previous foreground app
-            var bypass = BypassProcessList.Contains(appName.ToLowerInvariant());
+            var bypass = false; //KeepingProcessList.Contains(appName.ToLowerInvariant());
             if (!bypass)
             {
-                Console.WriteLine($"Boost {appName}");
+                Console.WriteLine($"Boosting foregrounded '{appName}' (PID: {procId})");
                 ToggleEfficiencyMode(procHandle, false);
             }
 
-            if (pendingProcPid != 0)
-            {
-                Console.WriteLine($"Throttle {pendingProcName}");
+            //if (pendingProcPid != 0)
+            //{
+            //    Console.WriteLine($"Throttle {pendingProcName} ({pendingProcPid})");
 
-                var prevProcHandle = Win32Api.OpenProcess((uint)Win32Api.ProcessAccessFlags.SetInformation, false, pendingProcPid);
-                if (prevProcHandle != IntPtr.Zero)
-                {
-                    ToggleEfficiencyMode(prevProcHandle, true);
-                    Win32Api.CloseHandle(prevProcHandle);
-                    pendingProcPid = 0;
-                    pendingProcName = "";
-                }
-            }
+            //    var prevProcHandle = Win32Api.OpenProcess((uint)Win32Api.ProcessAccessFlags.SetInformation, false, pendingProcPid);
+            //    if (prevProcHandle != IntPtr.Zero)
+            //    {
+            //        ToggleEfficiencyMode(prevProcHandle, true);
+            //        Win32Api.CloseHandle(prevProcHandle);
+            //        pendingProcPid = 0;
+            //        pendingProcName = "";
+            //    }
+            //}
+            
 
-            if (!bypass)
-            {
-                pendingProcPid = procId;
-                pendingProcName = appName;
-            }
+            //if (!bypass)
+            //{
+            //    pendingProcPid = procId;
+            //    pendingProcName = appName;
+            //}
 
             Win32Api.CloseHandle(procHandle);
         }
 
-        public static void ThrottleAllUserBackgroundProcesses()
+        public static void BoostAllUserBackgroundProcesses()
         {
+            Console.WriteLine("B: Boosting backgrounds.");
+
+
             var runningProcesses = Process.GetProcesses();
             var currentSessionID = Process.GetCurrentProcess().SessionId;
 
-            var sameAsThisSession = runningProcesses.Where(p => p.SessionId == currentSessionID);
+            var sameAsThisSession = runningProcesses.Where(
+                p => {
+                    ConsoleColor c1 = ConsoleColor.Red;
+                    ConsoleColor c2 = ConsoleColor.Red;
+
+                    bool mustBoost = KeepingProcessList.Contains($"{p.ProcessName.ToLowerInvariant()}.exe");
+                    //if (mustBoost)
+                    //    c1 = ConsoleColor.Green;
+
+                    bool sameSession = p.SessionId == currentSessionID;
+                    //if (sameSession)
+                    //    c2 = ConsoleColor.Green;
+
+                    //Console.ForegroundColor = c1;
+                    //Console.Write($"{p.ProcessName}\t");
+                    //Console.ForegroundColor = c2;
+                    //Console.WriteLine($"{sameSession}");
+                    //Console.ForegroundColor = ConsoleColor.White;
+
+                    return mustBoost && sameSession;
+                });
+
+
             foreach (var proc in sameAsThisSession)
             {
-                if (proc.Id == pendingProcPid) continue;
-                if (BypassProcessList.Contains($"{proc.ProcessName}.exe".ToLowerInvariant())) continue;
                 var hProcess = Win32Api.OpenProcess((uint)Win32Api.ProcessAccessFlags.SetInformation, false, (uint) proc.Id);
-                ToggleEfficiencyMode(hProcess, true);
+                ToggleEfficiencyMode(hProcess, false);
                 Win32Api.CloseHandle(hProcess);
             }
+
+            Console.WriteLine($"B: Done. {sameAsThisSession.Count()} processes affected.");
         }
     }
 }

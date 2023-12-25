@@ -1,21 +1,35 @@
-﻿using EnergyStar.Interop;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Runtime;
+using System.Threading.Tasks;
+using AntiEnergyStar.Interop;
 
-namespace EnergyStar
+namespace AntiEnergyStar
 {
     internal class Program
     {
         static CancellationTokenSource cts = new CancellationTokenSource();
 
-        static async void HouseKeepingThreadProc()
+        static void HouseKeepingThreadProc()
         {
             Console.WriteLine("House keeping thread started.");
+
+            var delay = Settings.Instance.Delay;
+
             while (!cts.IsCancellationRequested)
             {
                 try
                 {
-                    var houseKeepingTimer = new PeriodicTimer(TimeSpan.FromMinutes(5));
-                    await houseKeepingTimer.WaitForNextTickAsync(cts.Token);
-                    EnergyManager.ThrottleAllUserBackgroundProcesses();
+
+                    Task.Delay(TimeSpan.FromSeconds(delay), cts.Token).Wait();
+
+
+                    //var houseKeepingTimer = new PeriodicTimer(TimeSpan.FromMinutes(5));
+                    // await houseKeepingTimer.WaitForNextTickAsync(cts.Token);
+                    EnergyManager.BoostAllUserBackgroundProcesses();
                 }
                 catch (TaskCanceledException)
                 {
@@ -30,16 +44,17 @@ namespace EnergyStar
             // Nickel or higher will be better, but at least it works in Cobalt
             //
             // In .NET 5.0 and later, System.Environment.OSVersion always returns the actual OS version.
-            if (Environment.OSVersion.Version.Build < 22000)
-            {
-                Console.WriteLine("E: You are too poor to use this program.");
-                Console.WriteLine("E: Please upgrade to Windows 11 22H2 for best result, and consider ThinkPad Z13 as your next laptop.");
-                // ERROR_CALL_NOT_IMPLEMENTED
-                Environment.Exit(120);
-            }
+
+            //if (Environment.OSVersion.Version.Build < 22000)
+            //{
+            //    Console.WriteLine("E: You are too poor to use this program.");
+            //    Console.WriteLine("E: Please upgrade to Windows 11 22H2 for best result, and consider ThinkPad Z13 as your next laptop.");
+            //    // ERROR_CALL_NOT_IMPLEMENTED
+            //    Environment.Exit(120);
+            //}
 
             HookManager.SubscribeToWindowEvents();
-            EnergyManager.ThrottleAllUserBackgroundProcesses();
+            EnergyManager.BoostAllUserBackgroundProcesses();
 
             var houseKeepingThread = new Thread(new ThreadStart(HouseKeepingThreadProc));
             houseKeepingThread.Start();
@@ -61,6 +76,12 @@ namespace EnergyStar
 
             cts.Cancel();
             HookManager.UnsubscribeWindowEvents();
+
+
+            Console.WriteLine("EXIT");
+            Console.ReadLine();
+
+            Environment.Exit(0);
         }
     }
 }
